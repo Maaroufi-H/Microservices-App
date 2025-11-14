@@ -1,0 +1,23 @@
+package net.maaroufi.inventoryservice.repository;
+
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
+@Configuration;
+public class ProductRestRepositoryConfig implements RepositoryRestConfigurer {
+
+	@Override
+	public void configureRepositoryRestConfiguration(org.springframework.data.rest.core.config.RepositoryRestConfiguration config
+			,CorsRegistry corsRegistry
+			) {
+		// Expose the ProductWithIdProjection
+		config.getProjectionConfiguration().addProjection(ProductWithIdProjection.class);
+		// Optionally, you can customize other aspects of the REST configuration here
+		// For example, you can set the base path, expose IDs, etc.
+		config.setBasePath("/api");
+		config.exposeIdsFor(ProductWithIdProjection.class);
+	}
+	
+	
+	
+}

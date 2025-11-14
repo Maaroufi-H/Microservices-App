@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.springframework.data.jpa.repository.config.JpaRepositoryConfigExtension.JpaRepositoryRegistrationAotProcessor"/>
+    <fullyQualifiedTypeName name="net.maaroufi.customerservice.entities.Customer"/>
+    <fullyQualifiedTypeName name="jakarta.persistence.Id"/>
+    <fullyQualifiedTypeName name="jakarta.persistence.Entity"/>
+    <fullyQualifiedTypeName name="org.springframework.data.rest.core.annotation.RepositoryRestResource"/>
+    <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.GetMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.data.rest.core.config.Projection"/>
+    <fullyQualifiedTypeName name="org.springframework.boot.CommandLineRunner"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.repository.BillRepository"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.repository.ItemRepository"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.feign.ProductRestClient"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.feign.CustomerRestClient"/>
+    <fullyQualifiedTypeName name="org.springframework.hateoas.PagedModel"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.entities.Bill"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.entities.ProductItem"/>
+    <fullyQualifiedTypeName name="java.util.Random"/>
+    <fullyQualifiedTypeName name="net.maaroufi.billingservice.BillingServiceApplication"/>
+    <fullyQualifiedTypeName name="java.util.Arrays"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="java.util.stream.Collectors"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="java.lang.Override"/>
+</qualifiedTypeNameHistroy>

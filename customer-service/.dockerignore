@@ -1,0 +1,67 @@
+# Java build output
+/target/
+*.class
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.settings/
+.classpath
+.project
+.factorypath
+
+# Maven wrapper jar (but keep .mvnw script and .mvn directory)
+#.mvn/wrapper/
+
+# Test output and test directories (keep source test code, ignore test output)
+# (Do not ignore src/test/ as it contains source code)
+
+# Build outputs (generic)
+dist/
+build/
+out/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Documentation and markdown
+*.md
+README*
+HELP.md
+
+docs/
+
+# Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# Temporary and local files
+tmp/
+temp/
+*.tmp
+.local/
+local/
+
+# Logs and debug
+*.log
+debug/
+
+# Miscellaneous
+*.prefs
+
+# Exclude nothing that is required for build (keep pom.xml, src/, mvnw, etc.)

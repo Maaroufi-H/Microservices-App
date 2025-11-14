@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: Customer Service API
+  version: 1.0.0
+  description: API pour gérer les clients
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /customers/name:
+    get:
+      summary: Chercher des clients par nom
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Liste des clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+  /customers/email:
+    get:
+      summary: Obtenir l'email d'un client par nom
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Email du client
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /customers/{id}:
+    get:
+      summary: Obtenir un client par ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Client trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+  /customers:
+    post:
+      summary: Créer un nouveau client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '201':
+          description: Client créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string

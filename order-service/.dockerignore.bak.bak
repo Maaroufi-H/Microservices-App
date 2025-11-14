@@ -1,0 +1,65 @@
+# 1. Java build artifacts
+/target/
+*.class
+
+# 2. IDE and development environment files
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.factorypath
+.settings/
+
+# 3. Build outputs and temporary files
+dist/
+build/
+out/
+tmp/
+temp/
+*.tmp
+
+# 4. Test sources and debug files
+src/test/
+*.log
+debug/
+
+# 5. Version control
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+# 6. Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# 7. Documentation and markdown
+README*
+*.md
+HELP.md
+docs/
+
+# 8. Docker and Compose files
+Dockerfile*
+docker-compose*
+compose.yaml
+
+# 9. Miscellaneous
+*.prefs
+
+# 10. Exclude Maven wrapper and build tools (do NOT ignore these)
+# (As per instructions, do not include .mvn, .mvnw, .gradle, .gradlew)
+
+# 11. Exclude empty static and templates folders from ignore (keep them in image)
+!src/main/resources/static/
+!src/main/resources/templates/
+
+# End of .dockerignore

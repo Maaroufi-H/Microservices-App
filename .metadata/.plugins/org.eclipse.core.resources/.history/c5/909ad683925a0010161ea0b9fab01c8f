@@ -1,0 +1,9 @@
+package net.maaroufi.orderservice.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import net.maaroufi.billingservice.entities.Bill;
+
+public interface  BillRepository extends JpaRepository<Bill, Long> {
+
+}

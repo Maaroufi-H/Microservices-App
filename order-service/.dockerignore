@@ -1,0 +1,87 @@
+# 1. Java build artifacts
+/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# 2. IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+.settings/
+.classpath
+.project
+.factorypath
+*.prefs
+
+# 3. Build outputs and temp files
+dist/
+build/
+out/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# 4. Test and debug files
+test/
+tests/
+*.log
+*.test
+
+# 5. Version control
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+# 6. Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# 7. Documentation and markdown
+docs/
+*.md
+README*
+HELP.md
+
+# 8. Docker and compose files
+Dockerfile*
+docker-compose*
+.dockerignore*
+
+# 9. Miscellaneous
+local/
+.local/
+
+# 10. Node, Python, Go (for completeness, even if not detected)
+node_modules/
+npm-debug.log
+yarn-debug.log
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+/vendor/
+.go-cache/
+
+# 11. Exclude backup files
+*.bak
+
+# 12. Exclude files with no extension that are likely not needed
+# (Uncomment if you want to exclude all files with no extension)
+# *.
+
+# End of .dockerignore

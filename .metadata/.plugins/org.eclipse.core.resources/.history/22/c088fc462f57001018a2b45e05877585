@@ -1,0 +1,35 @@
+package divers;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Test {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+      Character[] hatem = {'h','a','t','e','m'};
+      println(hatem);
+      List<Integer> list = List.of(1,3,4);
+      sort(list);
+	}
+
+	
+	
+	public static <T> void print(T[] t) {
+	 Arrays.stream(t).forEach(e -> System.out.print(e));
+	}
+	
+	public static <T> void sort(List<Integer> list) {
+		list.stream().sorted().toList().reversed();
+	//	list.sort( (e1,e2) -> e2.compareTo(e1));
+		System.out.println(list);
+	}
+	
+	public static <T> void printArray(T[] array) {
+	    for (T element : array) {
+	        System.out.print(element + " ");
+	    }
+	    System.out.println();
+	}
+
+}

@@ -1,0 +1,15 @@
+package net.maaroufi.inventoryservice.repository;
+
+import org.springframework.data.rest.core.config.Projection;
+
+import net.maaroufi.inventoryservice.entities.Product;
+
+@Projection(name = "productWithId", types = { Product.class })
+public interface ProductWithIdProjection {
+    Long getId();
+    String getName();
+    String getDescription();
+    Double getPrice();
+    Integer getQuantity();
+    // You can add other properties as needed
+}

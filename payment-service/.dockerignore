@@ -1,0 +1,78 @@
+# Java build output
+/target/
+*.class
+
+# Maven wrapper JARs (but not the scripts or .mvn directory)
+#.mvn/wrapper/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+.settings/
+.classpath
+.project
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+# Test and development artifacts
+test/
+tests/
+*.log
+*.tmp
+tmp/
+temp/
+debug/
+
+# Documentation
+*.md
+README*
+HELP.md
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Build outputs (generic)
+dist/
+build/
+out/
+
+# Node.js, Python, Go (not present, but for completeness)
+node_modules/
+npm-debug.log
+yarn-debug.log
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+/vendor/
+*.test
+.go-cache/
+
+# Docker files (if not needed in build context)
+Dockerfile*
+docker-compose*
+
+# Local development
+.local/
+local/

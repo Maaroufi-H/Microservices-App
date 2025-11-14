@@ -1,0 +1,16 @@
+services:
+  java-paymentservice:
+    build:
+      context: .
+    container_name: java-paymentservice
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8083:8083"  # Exposed by Dockerfile
+    # env_file: ./.env  # Uncomment if .env file exists
+    # Add depends_on here if you add external services (e.g., databases)
+    # networks: [appnet]  # Uncomment if you add more services that need to communicate
+
+# No external services (databases, caches, etc.) detected in the project structure or Dockerfile.
+# No volumes section included as there are no persistent data requirements.
+# No networks section included as there is only one service.

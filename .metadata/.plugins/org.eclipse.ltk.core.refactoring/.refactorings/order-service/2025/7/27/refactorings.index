@@ -1,0 +1,10 @@
+1751387194318	Rename compilation unit 'Scatch.java'
+1751645626602	Copy file
+1751667816384	Rename package 'net.maaroufi.ordercontroller'
+1751824529842	Rename package 'net.maaroufi.billingservice'
+1751824547095	Rename package 'net.maaroufi.billingservice.repository'
+1751824564304	Rename package 'net.maaroufi.billingservice.feign'
+1751824578517	Rename package 'net.maaroufi.billingservice.entities'
+1751824588793	Rename package 'net.maaroufi.billingservice.controllers'
+1751824723560	Rename type 'BillRepository'
+1751824741218	Rename type 'BillingServiceApplication'

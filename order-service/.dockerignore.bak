@@ -1,0 +1,88 @@
+# Java build output
+/target/
+*.class
+
+# Maven wrapper JARs (but keep .mvn and mvnw scripts)
+.mvn/wrapper/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+.project
+.classpath
+.factorypath
+.settings/
+
+# Build directories
+build/
+dist/
+out/
+
+# Test sources (do not include in production image)
+src/test/
+
+# Logs and debug files
+*.log
+debug/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Documentation and markdown
+*.md
+README*
+HELP.md
+
+docs/
+
+# Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# Temporary and local files
+tmp/
+temp/
+*.tmp
+.local/
+local/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node.js, Python, Go (not detected, but safe to ignore common artifacts)
+node_modules/
+npm-debug.log
+yarn-debug.log
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+/vendor/
+*.test
+.go-cache/
+
+# Exclude lock files from ignore (as per instructions)
+# (No pattern for *.lock)
+
+# Exclude Maven wrapper scripts and .mvn directory from ignore (as per instructions)
+# (No pattern for mvnw, mvnw.cmd, .mvn/)

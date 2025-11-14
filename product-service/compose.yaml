@@ -1,0 +1,17 @@
+services:
+  java-inventoryservice:
+    build:
+      context: .
+    container_name: java-inventoryservice
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8081:8081"  # Exposed by Dockerfile and application.properties
+    # env_file: ./.env  # Uncomment if .env file exists
+    networks:
+      - backend
+    # Add depends_on here if you add external services (e.g., databases)
+
+networks:
+  backend:
+    driver: bridge

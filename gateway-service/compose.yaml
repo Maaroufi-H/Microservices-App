@@ -1,0 +1,17 @@
+services:
+  java-gatewayservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-gatewayservice
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8088:8088"  # Exposed as per Dockerfile and application.properties
+    # env_file: ./.env  # Uncomment if .env file exists
+    networks:
+      - gateway-net
+
+networks:
+  gateway-net:
+    driver: bridge

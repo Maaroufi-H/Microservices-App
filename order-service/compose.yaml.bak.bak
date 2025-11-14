@@ -1,0 +1,17 @@
+services:
+  java-billingservice:
+    build:
+      context: .
+    container_name: java-billingservice
+    ports:
+      - "8084:8084"  # Expose the Spring Boot service port
+    restart: unless-stopped
+    init: true  # Ensures proper signal handling
+    # env_file: ./.env  # Uncomment if .env file exists
+    # No external dependencies detected (database, cache, etc.)
+    # If you add a database or other services, add them below and update depends_on as needed
+
+# No external services (database, cache, etc.) were detected in the documentation or source code.
+# If you add such dependencies, define them here and update the 'depends_on' section for the main service.
+
+# No volumes section is included, as there are no persistent data requirements for this service.

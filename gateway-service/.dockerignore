@@ -1,0 +1,69 @@
+# Java build output
+/target/
+*.class
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.settings/
+.classpath
+.project
+
+# Test sources (do not include in image)
+src/test/
+
+# Build outputs (generic)
+dist/
+build/
+out/
+tmp/
+temp/
+*.tmp
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Documentation
+*.md
+README*
+HELP.md
+
+# Logs and debug
+*.log
+debug/
+
+# Miscellaneous
+local/
+.local/
+
+# Node.js, Python, Go (not detected, but safe to include for future-proofing)
+node_modules/
+npm-debug.log
+yarn-debug.log
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+/vendor/
+*.test
+.go-cache/
+
+# Docker files (do not ignore Dockerfile or docker-compose by default)
+# Dockerfile*
+# docker-compose*

@@ -1,0 +1,7 @@
+package net.maaroufi.inventoryservice.repository;
+
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+
+public interface ProductRestRepositoryConfig extends RepositoryRestConfigurer {
+
+}

@@ -1,0 +1,99 @@
+package net.maaroufi.billingservice.entities;
+
+import java.util.Date;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
+
+@Entity
+public class Bill {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	private Date billingDate;
+	
+	@OneToMany
+	private List<ProductItem> customerItem;
+	
+	@Transient 
+	private Customer customer;
+	
+	@Transient 
+	private Product product;
+
+
+	public Bill(Long id, Date billingDate, List<ProductItem> customerItem, Customer customer, Product product) {
+		super();
+		this.id = id;
+		this.billingDate = billingDate;
+		this.customerItem = customerItem;
+		this.customer = customer;
+		this.product = product;
+	}
+
+
+	public Bill() {
+		super();
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public Date getBillingDate() {
+		return billingDate;
+	}
+
+
+	public void setBillingDate(Date billingDate) {
+		this.billingDate = billingDate;
+	}
+
+
+	public ProductItem getCustomerItem() {
+		return customerItem;
+	}
+
+
+	public void setCustomerItem(ProductItem customerItem) {
+		this.customerItem = customerItem;
+	}
+
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
+
+	public Product getProduct() {
+		return product;
+	}
+
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+	
+	
+	
+	
+}

@@ -1,0 +1,66 @@
+package net.maaroufi.orderservice;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.Random;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+
+import net.maaroufi.billingservice.entities.Bill;
+import net.maaroufi.billingservice.entities.Customer;
+import net.maaroufi.billingservice.entities.Product;
+import net.maaroufi.billingservice.entities.ProductItem;
+import net.maaroufi.billingservice.feign.CustomerRestClient;
+import net.maaroufi.billingservice.feign.ProductRestClient;
+import net.maaroufi.orderservice.repository.BillRepository;
+import net.maaroufi.orderservice.repository.ItemRepository;
+
+@SpringBootApplication
+@EnableFeignClients
+public class BillingServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(BillingServiceApplication.class, args);
+	}
+
+	@Bean
+	CommandLineRunner runner (BillRepository billRepo,
+			                 ItemRepository itemRepo,
+			                 CustomerRestClient customerRestClient,
+			                 ProductRestClient productRestClient
+			) {
+		
+		
+		return args -> {
+			
+			Collection<Customer> customerCollection = customerRestClient.getAllCustomers().getContent();
+			
+			Collection<Product> productCollection  = productRestClient.getAllProducts().getContent();
+			
+			
+			customerCollection.forEach(cust -> {
+				Bill bill = new Bill();
+				bill.setCustomer(cust);
+				bill.setBillingDate(new Date());
+				billRepo.save(bill);
+				productCollection.forEach(prod -> {
+					ProductItem ite = new ProductItem();
+                    ite.setBill(bill);
+                    ite.setProductId(prod.getId());
+                    ite.setQuantity(new Random().nextInt(10));
+                    ite.setPrice(prod.getPrice());
+                    itemRepo.save(ite);
+				});
+				
+			});
+			
+			
+		};
+		
+		
+	}
+}

@@ -1,0 +1,20 @@
+services:
+  java-billingservice:
+    build:
+      context: .
+    container_name: java-billingservice
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8084:8084"  # Expose Spring Boot default port as per Dockerfile
+    # env_file: ./.env  # Uncomment if .env file exists
+    networks:
+      - billing-net
+    # Add depends_on if you add external services like databases
+
+# No external services (databases, caches, etc.) detected in the project structure or configuration.
+# If your application requires a database or other services, add them below.
+
+networks:
+  billing-net:
+    driver: bridge

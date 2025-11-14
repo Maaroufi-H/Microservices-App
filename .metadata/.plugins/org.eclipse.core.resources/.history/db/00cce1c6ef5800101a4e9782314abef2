@@ -1,0 +1,16 @@
+package net.maaroufi.ordercontroller;
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @PostMapping("/create")
+    public String createOrder(@RequestParam String orderId) {
+        // Ici tu pourrais sauvegarder en base.
+        kafkaTemplate.send("order-events", "OrderCreated:" + orderId);
+        return "Commande créée : " + orderId;
+    }
+}

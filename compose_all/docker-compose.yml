@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    image: eureka-server      # Vérifie le nom local exact
+    ports:
+      - "8761:8761"
+    networks:
+      - spring-net
+
+  customer-service:
+    image: customer-image     # Vérifie le nom local exact
+    ports:
+      - "8082:8082"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  product-service:
+    image: product-service      # 👉 Construis ton image avec ce nom
+    ports:
+      - "8081:8081"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  order-service:
+    image: order-service        # 👉 Construis ton image avec ce nom
+    ports:
+      - "8084:8084"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  payment-service:
+    image: payment-service      # 👉 Construis ton image avec ce nom
+    ports:
+      - "8083:8083"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+networks:
+  spring-net:

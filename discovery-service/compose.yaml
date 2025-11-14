@@ -1,0 +1,17 @@
+services:
+  java-discoveryservice:
+    build:
+      context: .
+    container_name: java-discoveryservice
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8761:8761"  # Eureka default port
+    # env_file: ./.env  # Uncomment if .env file exists
+    networks:
+      - backend
+    # No external dependencies detected in project files or documentation
+
+networks:
+  backend:
+    driver: bridge

@@ -1,0 +1,42 @@
+services:
+  java-orderservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-orderservice
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8084:8084"  # Exposed by Dockerfile, default Spring Boot port
+    # env_file: ./.env  # Uncomment if .env file exists
+    networks:
+      - appnet
+    # depends_on:  # Uncomment and add dependencies if external services are required
+    #   - postgres
+
+# If your application requires a database or other external service, add it here.
+# Example for PostgreSQL (uncomment and configure if needed):
+#  postgres:
+#    image: postgres:latest
+#    restart: unless-stopped
+#    environment:
+#      POSTGRES_USER: user
+#      POSTGRES_PASSWORD: password
+#      POSTGRES_DB: orderservice
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+#    networks:
+#      - appnet
+#    healthcheck:
+#      test: ["CMD", "pg_isready", "-U", "user"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
+networks:
+  appnet:
+    driver: bridge
+
+# Uncomment if you add a database or other service that needs persistent storage
+#volumes:
+#  pgdata:

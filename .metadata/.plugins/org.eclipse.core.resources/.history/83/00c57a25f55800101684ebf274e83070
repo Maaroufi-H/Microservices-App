@@ -1,0 +1,24 @@
+package net.maaroufi.paymentlistener;
+
+@Service
+public class PaymentListener {
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @KafkaListener(topics = "order-events", groupId = "payment-group")
+    public void listenOrderEvents(String message) {
+        System.out.println("Reçu : " + message);
+
+        String orderId = message.split(":")[1];
+
+        try {
+            // Simuler logique de paiement
+            System.out.println("Paiement en cours pour OrderId: " + orderId);
+            // Si OK
+            kafkaTemplate.send("payment-events", "PaymentProcessed:" + orderId);
+        } catch (Exception e) {
+            kafkaTemplate.send("payment-events", "PaymentFailed:" + orderId);
+        }
+    }
+}

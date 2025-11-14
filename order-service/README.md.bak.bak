@@ -1,0 +1,37 @@
+## Running the Billing Service with Docker
+
+This project includes a multi-stage Docker setup for building and running the Java-based Billing Service using Eclipse Temurin JDK 17. The provided Dockerfile and Docker Compose configuration allow you to containerize and run the service easily.
+
+### Project-Specific Docker Requirements
+- **Java Version:** Eclipse Temurin 17 (JDK for build, JRE for runtime)
+- **Build Tool:** Maven Wrapper (`mvnw`) is used for building the project inside the container
+- **Exposed Port:** `8084` (as defined in both the Dockerfile and `docker-compose.yml`)
+- **User:** Runs as a non-root user (`appuser`) for improved security
+
+### Environment Variables
+- The Dockerfile sets a default `JAVA_OPTS` for container-aware JVM memory settings:
+  - `JAVA_OPTS="-XX:MaxRAMPercentage=80.0 -XX:+UseContainerSupport"`
+- No additional environment variables are required by default. If you need to provide custom environment variables, you can uncomment and use the `env_file` section in `docker-compose.yml`.
+
+### Build and Run Instructions
+1. **Build and start the service:**
+   ```sh
+   docker compose up --build
+   ```
+   This will build the application JAR using Maven inside the container and start the service.
+
+2. **Accessing the service:**
+   - The service will be available on [http://localhost:8084](http://localhost:8084)
+
+### Special Configuration
+- **No external services** (such as databases or caches) are configured by default. If your application requires additional services, update `docker-compose.yml` accordingly.
+- The application is built with tests skipped for faster container builds.
+- The container is set to restart unless stopped and uses Docker's `init` for proper signal handling.
+
+### Ports
+- **java-billingservice:**
+  - Host: `8084` → Container: `8084`
+
+---
+
+_If you need to customize the build (e.g., add environment variables or connect to other services), edit the `docker-compose.yml` file as needed._
