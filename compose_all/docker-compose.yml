@@ -1,48 +1,159 @@
 version: '3.8'
 
+# Usage: run from this directory with:
+#   docker compose up --build
+#
+# Startup order: Zookeeper → Kafka → discovery-service → [core services] → gateway-service
+
 services:
-  eureka-server:
-    image: eureka-server      # Vérifie le nom local exact
+
+  # ─── Kafka Stack ──────────────────────────────────────────────────────────────
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    networks:
+      - spring-net
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep -q imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    ports:
+      - "9092:9092"
+    networks:
+      - spring-net
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8091:8080"
+    networks:
+      - spring-net
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  # ─── Service Discovery (Eureka) ───────────────────────────────────────────────
+
+  discovery-service:
+    build:
+      context: ../discovery-service
     ports:
       - "8761:8761"
     networks:
       - spring-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 40s
+
+  # ─── Core Microservices ───────────────────────────────────────────────────────
 
   customer-service:
-    image: customer-image     # Vérifie le nom local exact
+    build:
+      context: ../customer-service
     ports:
       - "8082:8082"
     networks:
       - spring-net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
 
   product-service:
-    image: product-service      # 👉 Construis ton image avec ce nom
+    build:
+      context: ../product-service
     ports:
       - "8081:8081"
     networks:
       - spring-net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
 
   order-service:
-    image: order-service        # 👉 Construis ton image avec ce nom
+    build:
+      context: ../order-service
     ports:
       - "8084:8084"
     networks:
       - spring-net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   payment-service:
-    image: payment-service      # 👉 Construis ton image avec ce nom
+    build:
+      context: ../payment-service
     ports:
       - "8083:8083"
     networks:
       - spring-net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  # ─── API Gateway ──────────────────────────────────────────────────────────────
+
+  gateway-service:
+    build:
+      context: ../gateway-service
+    ports:
+      - "8088:8088"
+    networks:
+      - spring-net
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      customer-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
 
 networks:
   spring-net:
+    driver: bridge
