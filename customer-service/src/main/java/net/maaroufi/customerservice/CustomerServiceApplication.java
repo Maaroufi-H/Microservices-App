@@ -22,20 +22,19 @@ public class CustomerServiceApplication {
 	@Bean
 	CommandLineRunner commandLineRunner(CustomerRepository customerRepository) {
 		return args -> {
-			Customer c = new Customer("hatem", "elhaj", "jax_marof@hotmail.com", 33);
-			Customer c2 = new Customer("kabila", "traore", "traore@hotmail.com", 77);
-		
-			customerRepository.save(c);
-			customerRepository.save(c2);
+			customerRepository.save(new Customer("Ahmed",   "Benali",   "ahmed.benali@email.com",   28));
+			customerRepository.save(new Customer("Fatima",  "Zahra",    "fatima.zahra@email.com",   35));
+			customerRepository.save(new Customer("Mohamed", "Amine",    "m.amine@email.com",        42));
+			customerRepository.save(new Customer("Sara",    "Dupont",   "sara.dupont@email.com",    24));
+			customerRepository.save(new Customer("Karim",   "Rousseau", "k.rousseau@email.com",     55));
+			customerRepository.save(new Customer("Leila",   "Martin",   "leila.martin@email.com",   31));
+			customerRepository.save(new Customer("Youssef", "Petit",    "y.petit@email.com",        19));
+			customerRepository.save(new Customer("Nadia",   "Bernard",  "nadia.bernard@email.com",  47));
 
-	    	List<Customer> list = customerRepository.findAll();
-            list.forEach(element -> System.out.println(element));
-            Predicate<Customer> p = el -> el.getAge() < 77;
-            List<Customer> newlist = list.stream().filter(p).collect(Collectors.toList());
-			System.out.println("filtered list");
-            newlist.forEach(el -> System.out.println(el));
-			System.out.println("Customer service application started successfully!");
-
+			List<Customer> list = customerRepository.findAll();
+			Predicate<Customer> p = el -> el.getAge() < 40;
+			List<Customer> young = list.stream().filter(p).collect(Collectors.toList());
+			System.out.println("=== Customers loaded: " + list.size() + " | Under 40: " + young.size() + " ===");
 		};
 	}
 
