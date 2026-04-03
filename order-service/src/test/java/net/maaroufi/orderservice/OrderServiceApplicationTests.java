@@ -1,10 +1,10 @@
-package net.maaroufi.billingservice;
+package net.maaroufi.orderservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BillingServiceApplicationTests {
+class OrderServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

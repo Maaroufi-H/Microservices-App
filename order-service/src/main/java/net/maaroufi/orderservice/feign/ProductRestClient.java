@@ -11,7 +11,7 @@ import net.maaroufi.orderservice.entities.Product;
 public interface ProductRestClient {
 
 	@GetMapping("api/products/{id}")
-	Product getProdcutByID(@PathVariable Long id);
+	Product getProductByID(@PathVariable Long id);
 	
 	@GetMapping("api/products")
 	PagedModel<Product> getAllProducts();

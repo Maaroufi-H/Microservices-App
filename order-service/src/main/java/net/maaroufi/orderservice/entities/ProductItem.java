@@ -1,6 +1,6 @@
 package net.maaroufi.orderservice.entities;
 
-import java.beans.Transient;
+import jakarta.persistence.Transient;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
