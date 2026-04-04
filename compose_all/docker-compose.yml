@@ -65,5 +65,36 @@ services:
       - AZURE_ML_ENDPOINT_URL=${AZURE_ML_ENDPOINT_URL:-https://YOUR_ENDPOINT.inference.ml.azure.com/score}
       - AZURE_ML_ENDPOINT_API_KEY=${AZURE_ML_ENDPOINT_API_KEY:-YOUR_API_KEY}
 
+  # Auth service - Java 21, Spring Security JWT
+  auth-service:
+    image: auth-service
+    ports:
+      - "8087:8087"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      # Pour MySQL : décommenter les lignes suivantes et ajouter SPRING_PROFILES_ACTIVE=mysql
+      # - SPRING_PROFILES_ACTIVE=mysql
+      # - MYSQL_USER=${MYSQL_USER:-wellness}
+      # - MYSQL_PASSWORD=${MYSQL_PASSWORD:-wellness}
+      # - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/wellness_auth_db
+
+  # Frontend Angular 18 (mode développement)
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ../frontend:/app
+    ports:
+      - "4200:4200"
+    command: sh -c "npm install && npm start -- --host 0.0.0.0 --port 4200"
+    networks:
+      - spring-net
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+
 networks:
   spring-net:

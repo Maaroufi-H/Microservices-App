@@ -1,0 +1,146 @@
+// ====================================================
+// WellnessShop — Thème médical vert
+// ====================================================
+@use '@angular/material' as mat;
+
+// Palette médicale verte
+$wellness-primary: mat.m2-define-palette(mat.$m2-green-palette, 800, 600, 900);
+$wellness-accent:  mat.m2-define-palette(mat.$m2-light-green-palette, 600, 400, 800);
+$wellness-warn:    mat.m2-define-palette(mat.$m2-amber-palette, 700);
+
+$wellness-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $wellness-primary,
+    accent:  $wellness-accent,
+    warn:    $wellness-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Inter, sans-serif',
+  ),
+));
+
+@include mat.all-component-themes($wellness-theme);
+
+// ====================================================
+// Variables CSS
+// ====================================================
+:root {
+  --w-primary:       #2E7D32;   // vert médical foncé
+  --w-primary-light: #4CAF50;   // vert vif
+  --w-accent:        #388E3C;   // vert intermédiaire
+  --w-bg:            #F1F8E9;   // fond vert très clair
+  --w-card-bg:       #FFFFFF;
+  --w-surface:       #E8F5E9;
+  --w-text:          #1B5E20;   // texte vert foncé
+  --w-text-muted:    #558B2F;
+  --w-white:         #FFFFFF;
+  --w-border:        #C8E6C9;
+  --w-warn:          #F57F17;
+  --w-shadow:        0 2px 12px rgba(46, 125, 50, 0.12);
+  --w-radius:        12px;
+  --w-radius-sm:     6px;
+}
+
+// ====================================================
+// Reset & Base
+// ====================================================
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--w-bg);
+  color: var(--w-text);
+}
+
+a {
+  color: var(--w-primary);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// ====================================================
+// Utilitaires globaux
+// ====================================================
+.wellness-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.wellness-card {
+  background: var(--w-card-bg);
+  border-radius: var(--w-radius);
+  box-shadow: var(--w-shadow);
+  border: 1px solid var(--w-border);
+  padding: 24px;
+}
+
+.wellness-badge {
+  background: var(--w-primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wellness-section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--w-text);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.wellness-section-subtitle {
+  font-size: 16px;
+  color: var(--w-text-muted);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.page-content {
+  padding-top: 80px; // hauteur navbar
+  min-height: calc(100vh - 80px);
+}
+
+// Bouton primaire personnalisé
+.btn-wellness {
+  background: var(--w-primary) !important;
+  color: white !important;
+  border-radius: var(--w-radius-sm) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+  transition: background 0.2s !important;
+
+  &:hover {
+    background: var(--w-accent) !important;
+  }
+}
+
+.btn-wellness-outline {
+  border: 2px solid var(--w-primary) !important;
+  color: var(--w-primary) !important;
+  background: transparent !important;
+  border-radius: var(--w-radius-sm) !important;
+  font-weight: 600 !important;
+
+  &:hover {
+    background: var(--w-surface) !important;
+  }
+}
+
+// Snackbar
+.snack-success .mdc-snackbar__surface {
+  background-color: var(--w-primary) !important;
+}
+
+.snack-error .mdc-snackbar__surface {
+  background-color: #c62828 !important;
+}
