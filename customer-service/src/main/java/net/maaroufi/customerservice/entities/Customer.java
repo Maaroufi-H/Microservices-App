@@ -20,6 +20,10 @@ public class Customer {
 	private String surname;
 	private String email;
 	private int age;
+	// ML features: used for user segmentation and Azure ML training
+	private String gender;             // ex: "M", "F", "other"
+	private String country;            // ex: "FR", "MA", "US"
+	private String preferredCategory;  // ex: "electronics", populated from behavior history
 
 	public Long getId() {
 		return id;
@@ -59,6 +63,30 @@ public class Customer {
 
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getPreferredCategory() {
+		return preferredCategory;
+	}
+
+	public void setPreferredCategory(String preferredCategory) {
+		this.preferredCategory = preferredCategory;
 	}
 
 	public Customer(String name, String surname, String email, int age) {

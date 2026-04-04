@@ -18,6 +18,9 @@ public class Product {
 	 private String description;
 	 private Double price;
 	 private Integer quantity;
+	 // ML features: used for content-based filtering and Azure ML training
+	 private String category;  // ex: "electronics", "clothing", "accessories"
+	 private String tags;      // comma-separated, ex: "summer,beach,promo,trending"
 	 public Product() {
 		super();
 	}
@@ -27,6 +30,16 @@ public class Product {
 		this.description = description;
 		this.price = price;
 		this.quantity = quantity;
+	}
+	 public Product(String name, String description, Double price, Integer quantity,
+			 String category, String tags) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.price = price;
+		this.quantity = quantity;
+		this.category = category;
+		this.tags = tags;
 	}
 	 public Long getId() {
 		return id;
@@ -58,5 +71,17 @@ public class Product {
 	 public void setQuantity(Integer quantity) {
 		 this.quantity = quantity;
 	 }
-	
+	 public String getCategory() {
+		 return category;
+	 }
+	 public void setCategory(String category) {
+		 this.category = category;
+	 }
+	 public String getTags() {
+		 return tags;
+	 }
+	 public void setTags(String tags) {
+		 this.tags = tags;
+	 }
+
 }

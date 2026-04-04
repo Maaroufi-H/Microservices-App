@@ -44,5 +44,26 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
 
+  tracking-service:
+    image: tracking-service
+    ports:
+      - "8085:8085"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+  recommendation-service:
+    image: recommendation-service
+    ports:
+      - "8086:8086"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - AZURE_ML_ENDPOINT_URL=${AZURE_ML_ENDPOINT_URL:-https://YOUR_ENDPOINT.inference.ml.azure.com/score}
+      - AZURE_ML_ENDPOINT_API_KEY=${AZURE_ML_ENDPOINT_API_KEY:-YOUR_API_KEY}
+
 networks:
   spring-net:

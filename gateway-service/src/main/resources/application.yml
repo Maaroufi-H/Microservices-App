@@ -10,3 +10,11 @@ spring:
           uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=/api/products/**
+        - id: r3
+          uri: lb://TRACKING-SERVICE
+          predicates:
+            - Path=/api/tracking/**
+        - id: r4
+          uri: lb://RECOMMENDATION-SERVICE
+          predicates:
+            - Path=/api/recommendations/**
