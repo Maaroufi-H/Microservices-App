@@ -86,6 +86,56 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+		<plugin>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>azure-webapp-maven-plugin</artifactId>
+			<version>2.13.0</version>
+			<configuration>
+				<subscriptionId>${azure.subscriptionId}</subscriptionId>
+				<resourceGroup>wellness-app-rg</resourceGroup>
+				<appName>wellness-recommendation</appName>
+				<region>westeurope</region>
+				<pricingTier>P1V2</pricingTier>
+				<runtime>
+					<os>Linux</os>
+					<javaVersion>Java 17</javaVersion>
+					<webContainer>Java SE</webContainer>
+				</runtime>
+				<deployment>
+					<resources>
+						<resource>
+							<directory>${project.basedir}/target</directory>
+							<includes>
+								<include>*.jar</include>
+							</includes>
+						</resource>
+					</resources>
+				</deployment>
+				<appSettings>
+					<property>
+						<name>SPRING_PROFILES_ACTIVE</name>
+						<value>azure</value>
+					</property>
+					<property>
+						<name>EUREKA_CLIENT_SERVICEURL_DEFAULTZONE</name>
+						<value>https://wellness-discovery.azurewebsites.net/eureka</value>
+					</property>
+					<property>
+						<name>AZURE_ML_ENDPOINT_URL</name>
+						<value>${AZURE_ML_ENDPOINT_URL}</value>
+					</property>
+					<property>
+						<name>AZURE_ML_ENDPOINT_API_KEY</name>
+						<value>${AZURE_ML_ENDPOINT_API_KEY}</value>
+					</property>
+					<property>
+						<name>SERVER_PORT</name>
+						<value>80</value>
+					</property>
+				</appSettings>
+			</configuration>
+		</plugin>
 		</plugins>
 	</build>
 </project>
