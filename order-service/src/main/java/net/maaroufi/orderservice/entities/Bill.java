@@ -1,5 +1,6 @@
 package net.maaroufi.orderservice.entities;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -9,27 +10,31 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
+import net.maaroufi.core.order.IOrder;
 
 @Entity
-public class Bill {
+public class Bill implements IOrder {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
+	/** ID of the customer who placed this order (persisted). */
+	private Long customerId;
+
 	private Date billingDate;
-	
+
 	@OneToMany
-	private List<ProductItem> customerItem;
-	
-	@Transient 
+	private List<WebOrderItem> customerItem;
+
+	@Transient
 	private Customer customer;
-	
-	@Transient 
+
+	@Transient
 	private Product product;
 
 
-	public Bill(Long id, Date billingDate, List<ProductItem> customerItem, Customer customer, Product product) {
+	public Bill(Long id, Date billingDate, List<WebOrderItem> customerItem, Customer customer, Product product) {
 		super();
 		this.id = id;
 		this.billingDate = billingDate;
@@ -64,12 +69,12 @@ public class Bill {
 	}
 
 
-	public List<ProductItem> getCustomerItem() {
+	public List<WebOrderItem> getCustomerItem() {
 		return customerItem;
 	}
 
 
-	public void setCustomerItem(List<ProductItem> customerItem) {
+	public void setCustomerItem(List<WebOrderItem> customerItem) {
 		this.customerItem = customerItem;
 	}
 
@@ -92,8 +97,26 @@ public class Bill {
 	public void setProduct(Product product) {
 		this.product = product;
 	}
-	
-	
-	
-	
+
+	public Long getCustomerId() { return customerId; }
+	public void setCustomerId(Long customerId) { this.customerId = customerId; }
+
+	// --- IOrder contract ---
+
+	@Override
+	public List<WebOrderItem> getOrderItems() {
+		return customerItem;
+	}
+
+	@Override
+	public OrderStatus getStatus() {
+		return OrderStatus.CONFIRMED;
+	}
+
+	@Override
+	public Instant getOrderDate() {
+		return billingDate != null ? billingDate.toInstant() : null;
+	}
+
 }
+

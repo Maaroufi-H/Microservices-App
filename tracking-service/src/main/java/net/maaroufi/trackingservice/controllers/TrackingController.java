@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -51,6 +52,42 @@ public class TrackingController {
         response.put("serverTimestamp", saved.getServerTimestamp());
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    /**
+     * Session close endpoint — called by the JS client on beforeunload or purchase confirmation.
+     *
+     * Persists the complete session item path (ordered list of productIds viewed)
+     * back to all existing BehaviorEvents for this session.
+     *
+     * Payload example:
+     * {
+     *   "sessionId": "sess-abc",
+     *   "sessionItemPath": [12, 45, 7],
+     *   "exitEvent": "TRANSACTION_COMPLETE"
+     * }
+     */
+    @PostMapping("/session/close")
+    public ResponseEntity<Map<String, Object>> closeSession(
+            @RequestBody Map<String, Object> body) {
+
+        String sessionId = (String) body.get("sessionId");
+        @SuppressWarnings("unchecked")
+        List<Long> sessionItemPath = body.containsKey("sessionItemPath")
+                ? (List<Long>) body.get("sessionItemPath")
+                : null;
+        String exitEvent = (String) body.getOrDefault("exitEvent", "");
+
+        if (sessionId == null || sessionId.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "sessionId is required"));
+        }
+
+        trackingService.closeSession(sessionId, sessionItemPath, exitEvent);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("sessionId", sessionId);
+        response.put("status", "closed");
+        return ResponseEntity.ok(response);
     }
 
     /**

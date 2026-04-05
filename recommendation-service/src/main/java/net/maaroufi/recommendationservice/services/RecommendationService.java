@@ -1,10 +1,13 @@
 package net.maaroufi.recommendationservice.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.maaroufi.core.domain.AppDomainContext;
+import net.maaroufi.core.recommendation.IRecommendationEngine;
 import net.maaroufi.recommendationservice.dto.AzureMLResponse;
 import net.maaroufi.recommendationservice.dto.ProductRecommendation;
 import net.maaroufi.recommendationservice.dto.RecommendationResponse;
 import net.maaroufi.recommendationservice.feign.ProductClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
@@ -15,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class RecommendationService {
+public class RecommendationService implements IRecommendationEngine {
 
     private final ProductClient productClient;
     private final RestTemplate restTemplate;
@@ -33,6 +36,9 @@ public class RecommendationService {
     @Value("${app.recommendations.fallback.top-n:10}")
     private int fallbackTopN;
 
+    @Autowired(required = false)
+    private AppDomainContext domainContext;
+
     public RecommendationService(ProductClient productClient) {
         this.productClient = productClient;
         this.restTemplate = new RestTemplate();
@@ -43,73 +49,80 @@ public class RecommendationService {
      * Returns personalized recommendations for a customer.
      *
      * Strategy:
-     *  1. Try to call Azure ML real-time endpoint.
-     *  2. On failure (endpoint not configured, network error, etc.),
-     *     fall back to returning the full product catalog ranked by price
-     *     (proxy for popularity until real purchase data is available).
+     *  1. Try to call Azure ML real-time endpoint (with domain_namespace for multi-domain routing).
+     *  2. On failure, fall back to returning the full product catalog ranked by price.
      */
     public RecommendationResponse getRecommendations(Long customerId) {
-        // Attempt Azure ML if the endpoint is configured
+        String namespace = domainContext != null ? domainContext.getNamespace() : "ecommerce";
         if (!azureMlEndpointUrl.startsWith("https://YOUR_")) {
             try {
-                return callAzureML(customerId);
+                return callAzureML(customerId, namespace);
             } catch (Exception e) {
-                // Log and fall through to fallback
                 System.err.println("[recommendation-service] Azure ML call failed: " + e.getMessage());
             }
         }
-
         return popularProductFallback(customerId);
     }
 
-    private RecommendationResponse callAzureML(Long customerId) throws Exception {
+    /** IRecommendationEngine contract — delegates to getRecommendations. */
+    @Override
+    public List<ProductRecommendation> recommend(Long customerId, String domainNamespace, int topN) {
+        return callAzureMLRaw(customerId, domainNamespace, topN);
+    }
+
+    private RecommendationResponse callAzureML(Long customerId, String domainNamespace) throws Exception {
+        List<ProductRecommendation> recommendations = callAzureMLRaw(customerId, domainNamespace, topN);
+        return new RecommendationResponse(customerId, "azure-ml", recommendations);
+    }
+
+    private List<ProductRecommendation> callAzureMLRaw(Long customerId, String domainNamespace, int n) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + azureMlApiKey);
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("customer_id", customerId);
-        requestBody.put("top_n", topN);
+        requestBody.put("top_n", n);
+        // domain_namespace routes the request to the correct Azure ML model
+        requestBody.put("domain_namespace", domainNamespace);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(azureMlEndpointUrl, request, String.class);
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(azureMlEndpointUrl, request, String.class);
+            AzureMLResponse mlResponse = objectMapper.readValue(response.getBody(), AzureMLResponse.class);
 
-        AzureMLResponse mlResponse = objectMapper.readValue(response.getBody(), AzureMLResponse.class);
-
-        List<ProductRecommendation> recommendations = mlResponse.getRecommendations().stream()
-                .map(scored -> {
-                    try {
-                        ProductRecommendation product = productClient.getProductById(scored.getProduct_id());
-                        product.setScore(scored.getScore());
-                        return product;
-                    } catch (Exception e) {
-                        // Product not found – return a stub with just the score
-                        ProductRecommendation stub = new ProductRecommendation();
-                        stub.setProductId(scored.getProduct_id());
-                        stub.setScore(scored.getScore());
-                        return stub;
-                    }
-                })
-                .collect(Collectors.toList());
-
-        return new RecommendationResponse(customerId, "azure-ml", recommendations);
+            return mlResponse.getRecommendations().stream()
+                    .map(scored -> {
+                        try {
+                            ProductRecommendation product = productClient.getProductById(scored.getProduct_id());
+                            product.setScore(scored.getScore());
+                            return product;
+                        } catch (Exception e) {
+                            ProductRecommendation stub = new ProductRecommendation();
+                            stub.setProductId(scored.getProduct_id());
+                            stub.setScore(scored.getScore());
+                            return stub;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     /**
      * Cold-start fallback: returns all products sorted by price descending.
-     * Replace this logic with a real popularity ranking once purchase data accumulates.
      */
     private RecommendationResponse popularProductFallback(Long customerId) {
         try {
             PagedModel<ProductRecommendation> paged = productClient.getAllProducts();
             List<ProductRecommendation> products = new ArrayList<>(paged.getContent());
 
-            // Assign a synthetic score and sort descending by price as a proxy for popularity
             products.sort(Comparator.comparingDouble(p -> -(p.getPrice() != null ? p.getPrice() : 0.0)));
 
             List<ProductRecommendation> top = products.stream()
                     .limit(fallbackTopN)
-                    .peek(p -> p.setScore(1.0)) // uniform score for fallback
+                    .peek(p -> p.setScore(1.0))
                     .collect(Collectors.toList());
 
             return new RecommendationResponse(customerId, "popular-fallback", top);

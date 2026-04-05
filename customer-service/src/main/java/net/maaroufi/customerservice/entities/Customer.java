@@ -4,9 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import net.maaroufi.core.customer.ICustomer;
 
 @Entity
-public class Customer {
+public class Customer implements ICustomer {
 
 	public Customer() {
 		super();
@@ -94,6 +95,23 @@ public class Customer {
 		this.surname = surname;
 		this.email = email;
 		this.age = age;
+	}
+
+	// --- ICustomer contract ---
+
+	@Override
+	public String getDisplayName() {
+		return name + " " + surname;
+	}
+
+	@Override
+	public String getPreferredSegment() {
+		return preferredCategory;
+	}
+
+	@Override
+	public String getCountryCode() {
+		return country;
 	}
 
 }

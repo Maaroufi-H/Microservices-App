@@ -18,6 +18,14 @@
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
 	</properties>
 	<dependencies>
+
+		<!-- Core domain contracts: IBehaviorEvent, IRecommendationEngine, AppDomainContext -->
+		<dependency>
+			<groupId>net.maaroufi</groupId>
+			<artifactId>core-abstractions</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

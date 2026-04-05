@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import net.maaroufi.orderservice.entities.Bill;
 import net.maaroufi.orderservice.entities.Customer;
 import net.maaroufi.orderservice.entities.Product;
-import net.maaroufi.orderservice.entities.ProductItem;
+import net.maaroufi.orderservice.entities.WebOrderItem;
 import net.maaroufi.orderservice.feign.CustomerRestClient;
 import net.maaroufi.orderservice.feign.ProductRestClient;
 import net.maaroufi.orderservice.repository.OrderRepository;
@@ -48,7 +48,7 @@ public class OrderServiceApplication {
 				bill.setBillingDate(new Date());
 				billRepo.save(bill);
 				productCollection.forEach(prod -> {
-					ProductItem ite = new ProductItem();
+					WebOrderItem ite = new WebOrderItem();
                     ite.setBill(bill);
                     ite.setProductId(prod.getId());
                     ite.setQuantity(new Random().nextInt(10));

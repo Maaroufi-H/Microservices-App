@@ -33,6 +33,18 @@ public class BehaviorEventDTO {
     // Flexible catch-all for extra context (e.g. {"referrer": "...", "device": "mobile"})
     private Map<String, String> metadata;
 
+    // ---- ML features (sent by the JS client) ----
+
+    /** ML feature #1 — time the user spent viewing the product, in milliseconds. */
+    private Long viewDurationMs;
+
+    /**
+     * ML feature #3 — ordered list of productIds browsed in the session so far.
+     * Maintained in sessionStorage client-side and sent with every event.
+     * Example: [12, 45, 7]
+     */
+    private java.util.List<Long> sessionItemPath;
+
     public BehaviorEventDTO() {}
 
     public String getSessionId() { return sessionId; }
@@ -61,4 +73,10 @@ public class BehaviorEventDTO {
 
     public Map<String, String> getMetadata() { return metadata; }
     public void setMetadata(Map<String, String> metadata) { this.metadata = metadata; }
+
+    public Long getViewDurationMs() { return viewDurationMs; }
+    public void setViewDurationMs(Long viewDurationMs) { this.viewDurationMs = viewDurationMs; }
+
+    public java.util.List<Long> getSessionItemPath() { return sessionItemPath; }
+    public void setSessionItemPath(java.util.List<Long> sessionItemPath) { this.sessionItemPath = sessionItemPath; }
 }
