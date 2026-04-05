@@ -7,7 +7,10 @@ import net.maaroufi.core.domain.AppDomainContext;
 import net.maaroufi.trackingservice.dto.BehaviorEventDTO;
 import net.maaroufi.trackingservice.dto.UtmParameters;
 import net.maaroufi.trackingservice.entities.BehaviorEvent;
+import net.maaroufi.trackingservice.entities.ProductTrackingStats;
+import net.maaroufi.trackingservice.enums.EventType;
 import net.maaroufi.trackingservice.repository.BehaviorEventRepository;
+import net.maaroufi.trackingservice.repository.ProductTrackingStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,6 +23,7 @@ import java.util.List;
 public class TrackingService {
 
     private final BehaviorEventRepository repository;
+    private final ProductTrackingStatsRepository statsRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
@@ -30,8 +34,10 @@ public class TrackingService {
     private AppDomainContext domainContext;
 
     public TrackingService(BehaviorEventRepository repository,
+                           ProductTrackingStatsRepository statsRepository,
                            KafkaTemplate<String, String> kafkaTemplate) {
         this.repository = repository;
+        this.statsRepository = statsRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
@@ -49,8 +55,8 @@ public class TrackingService {
         event.setClientTimestamp(dto.getClientTimestamp());
         event.setServerTimestamp(Instant.now());
 
-        // Domain namespace for ML routing
-        event.setDomainNamespace(domainContext != null ? domainContext.getNamespace() : "ecommerce");
+        String namespace = domainContext != null ? domainContext.getNamespace() : "ecommerce";
+        event.setDomainNamespace(namespace);
 
         // ML feature #1 — view duration
         event.setViewDurationMs(dto.getViewDurationMs());
@@ -85,6 +91,11 @@ public class TrackingService {
 
         BehaviorEvent saved = repository.save(event);
 
+        // Upsert product tracking stats for PRODUCT_VIEW events
+        if (EventType.PRODUCT_VIEW.equals(dto.getEventType()) && dto.getProductId() != null) {
+            updateProductStats(dto.getProductId(), dto.getViewDurationMs(), namespace);
+        }
+
         // Publish to Kafka — enriched with domainNamespace for Azure Event Hubs routing
         try {
             String enrichedJson = objectMapper.writeValueAsString(saved);
@@ -94,6 +105,17 @@ public class TrackingService {
         }
 
         return saved;
+    }
+
+    private void updateProductStats(Long productId, Long viewDurationMs, String namespace) {
+        ProductTrackingStats stats = statsRepository.findById(productId)
+                .orElse(new ProductTrackingStats(productId, namespace));
+        stats.setViewCount(stats.getViewCount() + 1);
+        if (viewDurationMs != null && viewDurationMs > 0) {
+            stats.setTotalViewDurationMs(stats.getTotalViewDurationMs() + viewDurationMs);
+        }
+        stats.setLastViewedAt(Instant.now());
+        statsRepository.save(stats);
     }
 
     /**
@@ -109,12 +131,7 @@ public class TrackingService {
 
     /**
      * Persists the full session item path for all events of a session.
-     * Called by POST /api/tracking/session/close (browser beforeunload or purchase confirmation).
-     * Allows backfilling the sessionItemPath on events that were sent before the full path was known.
-     *
-     * @param sessionId      Session identifier
-     * @param itemPath       Complete ordered list of productIds browsed during the session
-     * @param exitEventType  The event type that triggered the session close (e.g. "PURCHASE")
+     * Called by POST /api/tracking/session/close.
      */
     public void closeSession(String sessionId, List<Long> itemPath, String exitEventType) {
         String pathJson = "[]";
@@ -130,5 +147,13 @@ public class TrackingService {
             event.setSessionItemPathJson(finalPathJson);
             repository.save(event);
         });
+    }
+
+    public List<ProductTrackingStats> getAllProductStats() {
+        return statsRepository.findAllByOrderByViewCountDesc();
+    }
+
+    public ProductTrackingStats getProductStats(Long productId) {
+        return statsRepository.findById(productId).orElse(null);
     }
 }

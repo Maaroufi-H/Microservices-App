@@ -2,6 +2,7 @@ package net.maaroufi.trackingservice.controllers;
 
 import net.maaroufi.trackingservice.dto.BehaviorEventDTO;
 import net.maaroufi.trackingservice.entities.BehaviorEvent;
+import net.maaroufi.trackingservice.entities.ProductTrackingStats;
 import net.maaroufi.trackingservice.services.TrackingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,29 @@ public class TrackingController {
         response.put("serverTimestamp", saved.getServerTimestamp());
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    // ---- Product tracking stats endpoints ----
+
+    /**
+     * Returns aggregated tracking stats for a specific product.
+     * Includes viewCount, totalViewDurationMs, averageViewDurationMs, lastViewedAt.
+     */
+    @GetMapping("/stats/product/{productId}")
+    public ResponseEntity<ProductTrackingStats> getProductStats(@PathVariable Long productId) {
+        ProductTrackingStats stats = trackingService.getProductStats(productId);
+        if (stats == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(stats);
+    }
+
+    /**
+     * Returns stats for all tracked products, ordered by view count descending.
+     */
+    @GetMapping("/stats/products")
+    public ResponseEntity<List<ProductTrackingStats>> getAllProductStats() {
+        return ResponseEntity.ok(trackingService.getAllProductStats());
     }
 
     /**

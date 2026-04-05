@@ -18,3 +18,11 @@ spring:
           uri: lb://RECOMMENDATION-SERVICE
           predicates:
             - Path=/api/recommendations/**
+        - id: monitoring
+          uri: lb://MONITORING-SERVICE
+          predicates:
+            - Path=/api/monitoring/**
+        - id: geolocation
+          uri: lb://GEOLOCATION-SERVICE
+          predicates:
+            - Path=/api/geolocation/**
