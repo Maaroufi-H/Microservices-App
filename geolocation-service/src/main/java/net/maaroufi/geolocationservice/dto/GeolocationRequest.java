@@ -1,19 +1,5 @@
 package net.maaroufi.geolocationservice.dto;
 
-/**
- * Request payload for POST /api/geolocation/locate.
- *
- * The browser Geolocation API provides latitude and longitude after the user
- * accepts the popup. The frontend sends this payload to the service.
- *
- * Example payload:
- * {
- *   "customerId": 42,
- *   "sessionId": "sess-abc",
- *   "latitude": 48.8566,
- *   "longitude": 2.3522
- * }
- */
 public class GeolocationRequest {
 
     /** Null for anonymous users. */
@@ -26,6 +12,12 @@ public class GeolocationRequest {
 
     /** Longitude from navigator.geolocation.getCurrentPosition() */
     private Double longitude;
+
+    /** GPS accuracy in meters from navigator.geolocation.getCurrentPosition(). */
+    private Double accuracyMeters;
+
+    /** Client IP address for IP-based geolocation fallback. */
+    private String ipAddress;
 
     public GeolocationRequest() {}
 
@@ -40,4 +32,10 @@ public class GeolocationRequest {
 
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public Double getAccuracyMeters() { return accuracyMeters; }
+    public void setAccuracyMeters(Double accuracyMeters) { this.accuracyMeters = accuracyMeters; }
+
+    public String getIpAddress() { return ipAddress; }
+    public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
 }

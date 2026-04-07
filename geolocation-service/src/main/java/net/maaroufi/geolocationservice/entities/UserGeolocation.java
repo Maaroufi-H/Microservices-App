@@ -50,6 +50,15 @@ public class UserGeolocation {
 
     private Instant locatedAt;
 
+    /** GPS accuracy from navigator.geolocation (meters). */
+    private Double accuracyMeters;
+
+    /** IANA timezone identifier (e.g. "Europe/Paris"). */
+    private String timezone;
+
+    /** Geocoding source: "GPS" (Nominatim) or "IP" (ip-api.com). */
+    private String source;
+
     public UserGeolocation() {}
 
     // ---- Getters / Setters ----
@@ -89,4 +98,13 @@ public class UserGeolocation {
 
     public Instant getLocatedAt() { return locatedAt; }
     public void setLocatedAt(Instant locatedAt) { this.locatedAt = locatedAt; }
+
+    public Double getAccuracyMeters() { return accuracyMeters; }
+    public void setAccuracyMeters(Double accuracyMeters) { this.accuracyMeters = accuracyMeters; }
+
+    public String getTimezone() { return timezone; }
+    public void setTimezone(String timezone) { this.timezone = timezone; }
+
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
 }

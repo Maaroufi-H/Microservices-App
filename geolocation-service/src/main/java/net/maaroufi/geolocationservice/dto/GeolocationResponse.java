@@ -2,10 +2,6 @@ package net.maaroufi.geolocationservice.dto;
 
 import java.time.Instant;
 
-/**
- * Response for POST /api/geolocation/locate.
- * Contains the reverse-geocoded location derived from Nominatim.
- */
 public class GeolocationResponse {
 
     private Long geolocationId;
@@ -20,6 +16,9 @@ public class GeolocationResponse {
     private String postcode;
     private String fullAddress;
     private Instant locatedAt;
+    private Double accuracyMeters;
+    private String timezone;
+    private String source;
 
     public GeolocationResponse() {}
 
@@ -58,4 +57,13 @@ public class GeolocationResponse {
 
     public Instant getLocatedAt() { return locatedAt; }
     public void setLocatedAt(Instant locatedAt) { this.locatedAt = locatedAt; }
+
+    public Double getAccuracyMeters() { return accuracyMeters; }
+    public void setAccuracyMeters(Double accuracyMeters) { this.accuracyMeters = accuracyMeters; }
+
+    public String getTimezone() { return timezone; }
+    public void setTimezone(String timezone) { this.timezone = timezone; }
+
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
 }
