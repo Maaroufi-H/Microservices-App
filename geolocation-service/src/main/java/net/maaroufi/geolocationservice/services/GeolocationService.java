@@ -98,7 +98,13 @@ public class GeolocationService {
                 .queryParam("limit", limit)
                 .toUriString();
 
-        String json = restClient.get().uri(url).retrieve().body(String.class);
+        String json;
+        try {
+            json = restClient.get().uri(url).retrieve().body(String.class);
+        } catch (Exception e) {
+            log.warn("Forward geocode HTTP error for query={}: {}", query, e.getMessage());
+            return new ArrayList<>();
+        }
         List<ForwardGeocodeResult> results = new ArrayList<>();
         if (json == null) return results;
 
