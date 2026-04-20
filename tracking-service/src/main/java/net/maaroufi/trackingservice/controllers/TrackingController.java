@@ -115,8 +115,14 @@ public class TrackingController {
     }
 
     /**
-     * Health check / info endpoint.
+     * Called by order-service after a purchase to mark all session events converted=true.
      */
+    @PostMapping("/convert/{sessionId}")
+    public ResponseEntity<Map<String, String>> markConverted(@PathVariable String sessionId) {
+        trackingService.markSessionAsConverted(sessionId);
+        return ResponseEntity.ok(Map.of("sessionId", sessionId, "status", "converted"));
+    }
+
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         Map<String, String> status = new HashMap<>();

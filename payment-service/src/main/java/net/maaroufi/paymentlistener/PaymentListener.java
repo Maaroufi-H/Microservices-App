@@ -1,29 +1,23 @@
 package net.maaroufi.paymentlistener;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Service
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/payment")
 public class PaymentListener {
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    @PostMapping("/process")
+    public ResponseEntity<Map<String, String>> processPayment(@RequestBody Map<String, String> body) {
+        String orderId = body.getOrDefault("orderId", "unknown");
+        System.out.println("Paiement en cours pour OrderId: " + orderId);
+        return ResponseEntity.ok(Map.of("orderId", orderId, "status", "PaymentProcessed"));
+    }
 
-    @KafkaListener(topics = "order-events", groupId = "payment-group")
-    public void listenOrderEvents(String message) {
-        System.out.println("Reçu : " + message);
-
-        String orderId = message.split(":")[1];
-
-        try {
-            // Simuler logique de paiement
-            System.out.println("Paiement en cours pour OrderId: " + orderId);
-            // Si OK
-            kafkaTemplate.send("payment-events", "PaymentProcessed:" + orderId);
-        } catch (Exception e) {
-            kafkaTemplate.send("payment-events", "PaymentFailed:" + orderId);
-        }
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        return ResponseEntity.ok(Map.of("service", "payment-service", "status", "UP"));
     }
 }

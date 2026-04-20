@@ -12,8 +12,6 @@ import net.maaroufi.trackingservice.enums.EventType;
 import net.maaroufi.trackingservice.repository.BehaviorEventRepository;
 import net.maaroufi.trackingservice.repository.ProductTrackingStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,21 +22,15 @@ public class TrackingService {
 
     private final BehaviorEventRepository repository;
     private final ProductTrackingStatsRepository statsRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
-
-    @Value("${app.kafka.topic.behavior-events}")
-    private String behaviorEventsTopic;
 
     @Autowired(required = false)
     private AppDomainContext domainContext;
 
     public TrackingService(BehaviorEventRepository repository,
-                           ProductTrackingStatsRepository statsRepository,
-                           KafkaTemplate<String, String> kafkaTemplate) {
+                           ProductTrackingStatsRepository statsRepository) {
         this.repository = repository;
         this.statsRepository = statsRepository;
-        this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
     }
@@ -58,10 +50,8 @@ public class TrackingService {
         String namespace = domainContext != null ? domainContext.getNamespace() : "ecommerce";
         event.setDomainNamespace(namespace);
 
-        // ML feature #1 — view duration
         event.setViewDurationMs(dto.getViewDurationMs());
 
-        // ML feature #3 — session item path (stored as JSON array string)
         List<Long> path = dto.getSessionItemPath();
         if (path != null && !path.isEmpty()) {
             try {
@@ -71,7 +61,6 @@ public class TrackingService {
             }
         }
 
-        // ML label #2 — converted defaults to false; updated post-hoc by OrderEventConsumer
         event.setConverted(false);
 
         UtmParameters utm = dto.getUtm();
@@ -91,17 +80,14 @@ public class TrackingService {
 
         BehaviorEvent saved = repository.save(event);
 
-        // Upsert product tracking stats for PRODUCT_VIEW events
         if (EventType.PRODUCT_VIEW.equals(dto.getEventType()) && dto.getProductId() != null) {
             updateProductStats(dto.getProductId(), dto.getViewDurationMs(), namespace);
         }
 
-        // Publish to Kafka — enriched with domainNamespace for Azure Event Hubs routing
-        try {
-            String enrichedJson = objectMapper.writeValueAsString(saved);
-            kafkaTemplate.send(behaviorEventsTopic, saved.getSessionId(), enrichedJson);
-        } catch (JsonProcessingException e) {
-            kafkaTemplate.send(behaviorEventsTopic, saved.getSessionId(), event.getRawJson());
+        // Mark session as converted when a TRANSACTION_COMPLETE event is received
+        if (EventType.TRANSACTION_COMPLETE.equals(dto.getEventType())
+                && dto.getSessionId() != null && !dto.getSessionId().isBlank()) {
+            markSessionAsConverted(dto.getSessionId());
         }
 
         return saved;
@@ -118,10 +104,6 @@ public class TrackingService {
         statsRepository.save(stats);
     }
 
-    /**
-     * Updates all BehaviorEvents for a session, setting converted=true.
-     * Called by OrderEventConsumer when a TRANSACTION_COMPLETE event is received.
-     */
     public void markSessionAsConverted(String sessionId) {
         repository.findBySessionId(sessionId).forEach(event -> {
             event.setConverted(true);
@@ -129,11 +111,7 @@ public class TrackingService {
         });
     }
 
-    /**
-     * Persists the full session item path for all events of a session.
-     * Called by POST /api/tracking/session/close.
-     */
-    public void closeSession(String sessionId, List<Long> itemPath, String exitEventType) {
+    public void closeSession(String sessionId, List<Long> itemPath, String exitEvent) {
         String pathJson = "[]";
         if (itemPath != null && !itemPath.isEmpty()) {
             try {
