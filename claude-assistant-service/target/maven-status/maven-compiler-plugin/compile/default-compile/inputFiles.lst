@@ -1,0 +1,6 @@
+/home/user/Microservices-App/claude-assistant-service/src/main/java/net/maaroufi/claudeassistant/ClaudeAssistantServiceApplication.java
+/home/user/Microservices-App/claude-assistant-service/src/main/java/net/maaroufi/claudeassistant/controllers/ClaudeController.java
+/home/user/Microservices-App/claude-assistant-service/src/main/java/net/maaroufi/claudeassistant/dto/ChatRequest.java
+/home/user/Microservices-App/claude-assistant-service/src/main/java/net/maaroufi/claudeassistant/dto/ChatResponse.java
+/home/user/Microservices-App/claude-assistant-service/src/main/java/net/maaroufi/claudeassistant/dto/ConversationMessage.java
+/home/user/Microservices-App/claude-assistant-service/src/main/java/net/maaroufi/claudeassistant/services/ClaudeService.java

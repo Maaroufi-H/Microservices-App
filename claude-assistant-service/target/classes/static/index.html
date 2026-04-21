@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Assistant — Microservices Dev</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #1a1a2e;
+            border-bottom: 1px solid #2d2d4e;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 { font-size: 1.1rem; font-weight: 600; color: #a78bfa; }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #312e81;
+            color: #c4b5fd;
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 0.93rem;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #312e81;
+            color: #e0e7ff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: #1e1e2e;
+            color: #e0e0e0;
+            border: 1px solid #2d2d4e;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.streaming { border-color: #a78bfa; }
+
+        #input-area {
+            border-top: 1px solid #2d2d4e;
+            padding: 16px 24px;
+            display: flex;
+            gap: 12px;
+            background: #0f0f0f;
+        }
+
+        #message-input {
+            flex: 1;
+            background: #1e1e2e;
+            border: 1px solid #2d2d4e;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            min-height: 48px;
+            max-height: 200px;
+        }
+
+        #message-input:focus { border-color: #7c3aed; }
+
+        button {
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            border: none;
+        }
+
+        #send-btn { background: #7c3aed; color: white; }
+        #send-btn:hover { background: #6d28d9; }
+        #send-btn:disabled { background: #3d2a6e; cursor: not-allowed; }
+
+        #clear-btn {
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #374151;
+            font-size: 0.85rem;
+            padding: 12px 16px;
+        }
+
+        #clear-btn:hover { background: #1e1e2e; color: #e0e0e0; }
+
+        .hint {
+            text-align: center;
+            color: #4b5563;
+            font-size: 0.8rem;
+            padding: 8px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid #6b7280;
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Claude Assistant</h1>
+    <span class="badge">claude-opus-4-7</span>
+    <span class="badge" style="margin-left:auto; background:#0d2a0d; color:#6ee7b7;">Microservices Dev</span>
+</header>
+
+<div id="chat-container">
+    <div class="hint">Ask me anything about the microservices application — architecture, new features, code, deployment.</div>
+</div>
+
+<div id="input-area">
+    <textarea id="message-input" placeholder="Ask Claude about your microservices app..." rows="1"></textarea>
+    <button id="clear-btn">Clear</button>
+    <button id="send-btn">Send</button>
+</div>
+
+<script>
+    const chat = document.getElementById('chat-container');
+    const input = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    let history = [];
+
+    function appendMessage(role, text, streaming) {
+        const div = document.createElement('div');
+        div.className = 'message ' + role + (streaming ? ' streaming' : '');
+        div.textContent = text;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+        return div;
+    }
+
+    async function send() {
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        input.style.height = 'auto';
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = 'Thinking <span class="spinner"></span>';
+
+        appendMessage('user', text, false);
+        const assistantDiv = appendMessage('assistant', '', true);
+        let reply = '';
+
+        try {
+            const resp = await fetch('/api/claude/stream', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history: history })
+            });
+
+            const reader = resp.body.getReader();
+            const dec = new TextDecoder();
+            let buf = '';
+            let currentEvent = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buf += dec.decode(value, { stream: true });
+                const lines = buf.split('\n');
+                buf = lines.pop();
+
+                for (const line of lines) {
+                    if (line.startsWith('event:')) {
+                        currentEvent = line.slice(6).trim();
+                    } else if (line.startsWith('data:')) {
+                        const data = line.slice(5).trim();
+                        if (currentEvent === 'done' || data === '[DONE]') {
+                            assistantDiv.classList.remove('streaming');
+                        } else if (currentEvent === 'delta' || currentEvent === '') {
+                            reply += data;
+                            assistantDiv.textContent = reply;
+                            chat.scrollTop = chat.scrollHeight;
+                        }
+                        currentEvent = '';
+                    }
+                }
+            }
+
+            history.push({ role: 'user', content: text });
+            history.push({ role: 'assistant', content: reply });
+            if (history.length > 20) history = history.slice(-20);
+
+        } catch (e) {
+            assistantDiv.textContent = 'Error: ' + e.message;
+            assistantDiv.classList.remove('streaming');
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
+        }
+    }
+
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+    input.addEventListener('input', function() {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 200) + 'px';
+    });
+    clearBtn.addEventListener('click', function() {
+        history = [];
+        chat.innerHTML = '<div class="hint">Conversation cleared.</div>';
+    });
+</script>
+</body>
+</html>

@@ -38,6 +38,10 @@ spring:
           uri: lb://GEOLOCATION-SERVICE
           predicates:
             - Path=/api/geolocation/**
+        - id: claude
+          uri: lb://CLAUDE-ASSISTANT-SERVICE
+          predicates:
+            - Path=/api/claude/**
 
 server:
   port: ${PORT:8088}

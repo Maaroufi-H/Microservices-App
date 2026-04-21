@@ -1,0 +1,6 @@
+net/maaroufi/claudeassistant/ClaudeAssistantServiceApplication.class
+net/maaroufi/claudeassistant/dto/ChatRequest.class
+net/maaroufi/claudeassistant/controllers/ClaudeController.class
+net/maaroufi/claudeassistant/dto/ChatResponse.class
+net/maaroufi/claudeassistant/services/ClaudeService.class
+net/maaroufi/claudeassistant/dto/ConversationMessage.class
